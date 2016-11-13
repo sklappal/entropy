@@ -1,209 +1,3 @@
-function Ball(pos, vel, clr)
-{
-  this.pos = pos;
-  this.vel = vel;
-  this.radius = 0.002;
-  this.clr = clr;
-
-  this.clone  = function ()
-  {
-    return new Ball(vec2.clone(this.pos), vec2.clone(this.vel), this.radius, this.clr);
-  }
-
-  return this;
-}
-
-function Wall(from, to)
-{
-  this.from = from;
-  this.to = to;
-  this.direction = vec2.subtract(vec2.create(), this.to, this.from);
-  this.sqrLen = vec2.sqrLen(this.direction);
-  this.normal = vec2.normalize(vec2.create(), vec2.fromValues(-this.direction[1], this.direction[0]));
-}
-
-
-function SliderControl(pos, title, contextGetter) {
-
-  this.myTitle = title;
-  this.contextGetter = contextGetter;
-
-  this.val = 0.5;
-  var width = 100;
-  var height = 10;
-  var knobHeight = 30;
-  var knobWidth = 10;
-  this.position = pos;
-  this.dragging = false;
-  var that = this;
-  
-  this.Draw = function() {
-    var ctx = this.contextGetter();
-          
-    ctx.fillStyle = "black";
-    var main = MainBox();
-    ctx.fillRect(main.x, main.y, main.w, main.h);
-    
-    ctx.fillStyle = "lightgrey";
-    var knobBox = KnobBox();
-    ctx.fillRect(knobBox.x, knobBox.y, knobBox.w, knobBox.h);
-    this.NormalText(this.myTitle, main.x - 2, knobBox.y - 5, "12px Arial", "black");
-  }
-  
-  this.NormalText = function(text, posx, posy, font, color) {
-    var ctx = this.contextGetter();
-    ctx.font = font;
-    ctx.fillStyle = color;
-    ctx.fillText(text, posx, posy);
-  }
-
-  function BoundingBox() {
-    return {
-      x: that.position.x - knobWidth,
-      y: KnobBox().y - 20,
-      w: width + 3 * knobWidth,
-      h: knobHeight + 20
-    }
-  }
-  
-  function MainBox() {
-    return {
-      x: that.position.x, 
-      y: that.position.y,
-      w: width,
-      h: height
-    };
-  }
-  
-  function KnobBox() {
-    return { 
-      x: that.val * width + pos.x - knobWidth * 0.5, 
-      y: that.position.y - knobHeight * 0.5 + height * 0.5, 
-      w: knobWidth, 
-      h: knobHeight 
-    };
-  }
-  
-  function BoxContains(box, coords) {
-    return coords.x >= box.x && 
-      coords.x <= box.x + box.w &&
-      coords.y >= box.y &&
-      coords.y <= box.y + box.h;
-  }
-  
-  this.Contains = function(coords) {
-    return BoxContains(KnobBox(), coords) || BoxContains(MainBox(), coords);
-  }
-  
-  this.OnMouseDown = function(coords, button) {
-    if (button == 3) {
-      return;
-    }
-    
-    if (BoxContains(KnobBox(), coords)) {
-      this.dragging = true;
-    } else if(BoxContains(MainBox(), coords)) {
-      SetValAtCoord(coords);
-      this.dragging = true;        
-    }
-  }
-  
-  this.OnMouseUp = function() {
-    this.dragging = false;
-  }
-  
-  function SetValAtCoord(coords) {
-    var coordx = coords.x - that.position.x;
-    coordx = Math.max(0, coordx);
-    coordx = Math.min(width, coordx);
-    that.val = coordx / width;
-  }
-  
-  this.OnMouseMove = function(coords) {
-    if (this.dragging) {
-      SetValAtCoord(coords);        
-    }
-  }
-  
-}
-
-function Button(pos, title, contextGetter, callback) {
-
-  this.myTitle = title;
-  this.contextGetter = contextGetter;
-  this.callback = callback;
-  this.hasMouse = false;
-  
-  var width = 80;
-  var height = 30;  
-  this.position = pos;  
-  var that = this;
-  
-  this.Draw = function() {
-    var ctx = this.contextGetter();
-
-    var main = MainBox();
-    ctx.fillStyle = "white"
-    if (this.hasMouse)
-    {
-      ctx.fillStyle = "lightgray"
-    }
-    ctx.fillRect(main.x, main.y, main.w, main.h)
-    ctx.strokeStyle = "black";
-    ctx.strokeRect(main.x, main.y, main.w, main.h);
-    
-    ctx.font = "12px Arial";
-    ctx.fillStyle =  "black";
-    ctx.fillText(this.myTitle, main.x + main.w * 0.3, main.y + 20);    
-  }
-  
-  function MainBox() {
-    return {
-      x: that.position.x, 
-      y: that.position.y,
-      w: width,
-      h: height
-    };
-  }
-
-  function BoxContains(box, coords) {
-    return coords.x >= box.x && 
-      coords.x <= box.x + box.w &&
-      coords.y >= box.y &&
-      coords.y <= box.y + box.h;
-  }
-
-  this.OnMouseDown = function(coords, button) {
-    if (button == 3) {
-      return;
-    }
-    
-    if (BoxContains(MainBox(), coords)) {
-      this.pressed = true;
-    } 
-  }
-
-  this.OnMouseUp = function(coords, button) {
-    if (button == 3) {
-      return;
-    }
-    
-    if (BoxContains(MainBox(), coords) && this.pressed) {
-      this.callback();
-    }
-    this.pressed = false;
-  }
-
-  this.OnMouseMove = function(coords) {
-    this.hasMouse = BoxContains(MainBox(), coords);
-    if (!this.hasMouse)
-    {
-      this.pressed = false;
-    }
-  }
-
-}
-
 function App() {
 
   var minExtent = 0;
@@ -661,4 +455,210 @@ function App() {
   }
 
   return this;
+}
+
+function Ball(pos, vel, clr)
+{
+  this.pos = pos;
+  this.vel = vel;
+  this.radius = 0.002;
+  this.clr = clr;
+
+  this.clone  = function ()
+  {
+    return new Ball(vec2.clone(this.pos), vec2.clone(this.vel), this.radius, this.clr);
+  }
+
+  return this;
+}
+
+function Wall(from, to)
+{
+  this.from = from;
+  this.to = to;
+  this.direction = vec2.subtract(vec2.create(), this.to, this.from);
+  this.sqrLen = vec2.sqrLen(this.direction);
+  this.normal = vec2.normalize(vec2.create(), vec2.fromValues(-this.direction[1], this.direction[0]));
+}
+
+
+function SliderControl(pos, title, contextGetter) {
+
+  this.myTitle = title;
+  this.contextGetter = contextGetter;
+
+  this.val = 0.5;
+  var width = 100;
+  var height = 10;
+  var knobHeight = 30;
+  var knobWidth = 10;
+  this.position = pos;
+  this.dragging = false;
+  var that = this;
+  
+  this.Draw = function() {
+    var ctx = this.contextGetter();
+          
+    ctx.fillStyle = "black";
+    var main = MainBox();
+    ctx.fillRect(main.x, main.y, main.w, main.h);
+    
+    ctx.fillStyle = "lightgrey";
+    var knobBox = KnobBox();
+    ctx.fillRect(knobBox.x, knobBox.y, knobBox.w, knobBox.h);
+    this.NormalText(this.myTitle, main.x - 2, knobBox.y - 5, "12px Arial", "black");
+  }
+  
+  this.NormalText = function(text, posx, posy, font, color) {
+    var ctx = this.contextGetter();
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.fillText(text, posx, posy);
+  }
+
+  function BoundingBox() {
+    return {
+      x: that.position.x - knobWidth,
+      y: KnobBox().y - 20,
+      w: width + 3 * knobWidth,
+      h: knobHeight + 20
+    }
+  }
+  
+  function MainBox() {
+    return {
+      x: that.position.x, 
+      y: that.position.y,
+      w: width,
+      h: height
+    };
+  }
+  
+  function KnobBox() {
+    return { 
+      x: that.val * width + pos.x - knobWidth * 0.5, 
+      y: that.position.y - knobHeight * 0.5 + height * 0.5, 
+      w: knobWidth, 
+      h: knobHeight 
+    };
+  }
+  
+  function BoxContains(box, coords) {
+    return coords.x >= box.x && 
+      coords.x <= box.x + box.w &&
+      coords.y >= box.y &&
+      coords.y <= box.y + box.h;
+  }
+  
+  this.Contains = function(coords) {
+    return BoxContains(KnobBox(), coords) || BoxContains(MainBox(), coords);
+  }
+  
+  this.OnMouseDown = function(coords, button) {
+    if (button == 3) {
+      return;
+    }
+    
+    if (BoxContains(KnobBox(), coords)) {
+      this.dragging = true;
+    } else if(BoxContains(MainBox(), coords)) {
+      SetValAtCoord(coords);
+      this.dragging = true;        
+    }
+  }
+  
+  this.OnMouseUp = function() {
+    this.dragging = false;
+  }
+  
+  function SetValAtCoord(coords) {
+    var coordx = coords.x - that.position.x;
+    coordx = Math.max(0, coordx);
+    coordx = Math.min(width, coordx);
+    that.val = coordx / width;
+  }
+  
+  this.OnMouseMove = function(coords) {
+    if (this.dragging) {
+      SetValAtCoord(coords);        
+    }
+  }
+  
+}
+
+function Button(pos, title, contextGetter, callback) {
+
+  this.myTitle = title;
+  this.contextGetter = contextGetter;
+  this.callback = callback;
+  this.hasMouse = false;
+  
+  var width = 80;
+  var height = 30;  
+  this.position = pos;  
+  var that = this;
+  
+  this.Draw = function() {
+    var ctx = this.contextGetter();
+
+    var main = MainBox();
+    ctx.fillStyle = "white"
+    if (this.hasMouse)
+    {
+      ctx.fillStyle = "lightgray"
+    }
+    ctx.fillRect(main.x, main.y, main.w, main.h)
+    ctx.strokeStyle = "black";
+    ctx.strokeRect(main.x, main.y, main.w, main.h);
+    
+    ctx.font = "12px Arial";
+    ctx.fillStyle =  "black";
+    ctx.fillText(this.myTitle, main.x + main.w * 0.3, main.y + 20);    
+  }
+  
+  function MainBox() {
+    return {
+      x: that.position.x, 
+      y: that.position.y,
+      w: width,
+      h: height
+    };
+  }
+
+  function BoxContains(box, coords) {
+    return coords.x >= box.x && 
+      coords.x <= box.x + box.w &&
+      coords.y >= box.y &&
+      coords.y <= box.y + box.h;
+  }
+
+  this.OnMouseDown = function(coords, button) {
+    if (button == 3) {
+      return;
+    }
+    
+    if (BoxContains(MainBox(), coords)) {
+      this.pressed = true;
+    } 
+  }
+
+  this.OnMouseUp = function(coords, button) {
+    if (button == 3) {
+      return;
+    }
+    
+    if (BoxContains(MainBox(), coords) && this.pressed) {
+      this.callback();
+    }
+    this.pressed = false;
+  }
+
+  this.OnMouseMove = function(coords) {
+    this.hasMouse = BoxContains(MainBox(), coords);
+    if (!this.hasMouse)
+    {
+      this.pressed = false;
+    }
+  }
+
 }

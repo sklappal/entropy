@@ -15,10 +15,9 @@ function App() {
     canvas_y_offset = (canvas.height - minExtent) * 0.5;  
     
     GetCanvas().onmousedown = OnMouseDownCB;
-    GetCanvas().onmouseup = OnMouseUpCB;
+    document.onmouseup = OnMouseUpCB;
     GetCanvas().onmousemove = OnMouseMoveCB;
-    GetCanvas().onmouseout = OnMouseOutCB;
-    
+        
     AddWall(0, 0, Width(), 0);
     AddWall(0, Height(), Width(), Height());
 
@@ -425,11 +424,6 @@ function App() {
     OnMouseMove(canv);
   }
 
-  function OnMouseOutCB(ev)
-  {
-    OnMouseOut();
-  }
-
   function OnMouseDown(coords, button) {
     for (var i = 0; i < sliderList.length; i++) {
       sliderList[i].OnMouseDown(coords, button);
@@ -449,13 +443,6 @@ function App() {
       sliderList[i].OnMouseMove(coords);
     }    
     this.button.OnMouseMove(coords)
-  }
-
-  function OnMouseOut()
-  { 
-    for (var i = 0; i < sliderList.length; i++) {
-      sliderList[i].dragging = false;
-    }    
   }
 
   return this;

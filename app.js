@@ -227,6 +227,10 @@ function App() {
     ctx.moveTo(from[0], from[1]);
     ctx.lineTo(to[0], to[1]);
     ctx.stroke();
+
+    DrawBall(new Ball(wall.from, [0,0,0], 'black'));
+    DrawBall(new Ball(wall.to, [0,0,0], 'black'));
+
   }
 
   function Simulate() 
